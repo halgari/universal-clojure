@@ -78,13 +78,24 @@
      :value nd
      :meta (meta nd)})
 
-(defn is-intrinsic? [n]
-     false)
+
+(defn parse-if [form env]
+    (let [[_ cond then & else] form]
+        {:node-type :if
+         :cond (parse cond env)
+         :then (parse then env)
+         :else (if else (parse else env) (parse nil env))
+         :meta (meta form)}))
+    
 
 (def ^:dynamic *compiler-intrinsics*
     {'if parse-if})
 
-(defn parse-intrinsic [nd env] false)
+(defn is-intrinsic? [n]
+     (contains? *compiler-intrinsics* n))
+
+(defn parse-intrinsic [nd env]
+    ((get *compiler-intrinsics* (first nd)) nd env))
 
 (defn parse-invoke [nd env]
     (let [n (first nd)]
