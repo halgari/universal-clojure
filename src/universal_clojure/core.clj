@@ -8,6 +8,24 @@
                          symbol? :symbol
                          number? :number})
 
+(defn spec-parse [spec data]
+    """Helper function for parsing arguments"""
+    (loop [data data
+           spec spec
+           result {}]
+          (let [curspec (first spec)]
+              (cond (or (not data) (not spec)) result
+                    (= (first spec) :rest) (assoc result :rest data)
+                    ((first curspec) (first data)) 
+                     (recur (next data) 
+                            (next spec)
+                            (assoc result (fnext (first spec))
+                                          (first data)))
+                    :default
+                     (recur data
+                            (next spec)
+                            result)))))
+
 (defn get-node-kw [nd env]
     """For a given node, return a keyword. Why not use (type nd)? Well that isn't
     platform agnostic. Instead we want to unify all versions of maps under :map,
@@ -15,7 +33,7 @@
     (let [kw (second (first (filter (fn [[k v]] (k nd)) *tp-maps*)))]
          (if kw 
              kw
-             (throw (Exception. (str "Unknown Node type " nd))))))
+             (throw (Exception. (str "Unknown Node type " (type nd)))))))
                          
 
 (defn filterable-key [k]
@@ -42,10 +60,13 @@
      :items (map parse (mapcat identity nd) (repeat env))
      :meta (meta nd)})
 
-(defn parse [nd env]
-    (let [result (parse-node (macroexpand nd) env)]
+(defn parse 
+    ([nd]
+     (parse nd {}))
+    ([nd env]
+     (let [result (parse-node (macroexpand nd) env)]
          (select-keys result
-                      (for [[k v] result :when (not (filterable-key v))] k))))
+                      (for [[k v] result :when (not (filterable-key v))] k)))))
 
 (def parse-invoke)
 
@@ -86,10 +107,42 @@
          :then (parse then env)
          :else (if else (parse else env) (parse nil env))
          :meta (meta form)}))
+
+(defn parse-fn-body [form env]
+    (let [[args & body] form
+          [args & restarg] (split-with #(not (= '& %)) args)
+          restarg (next (first restarg))
+          last-is-rest (= (count restarg) 1)]
+          (println restarg (count restarg))
+         {:args (concat args restarg)
+          :last-is-rest last-is-rest
+          :body (parse body env)
+          :required-arity (count args)
+          :rest-arg (when last-is-rest (first restarg))
+          :meta (meta form)}))
     
+(defn parse-fn* [form env]
+    (let [sp (spec-parse [[symbol? :fn]
+                          [symbol? :name]
+                          [vector? :args]
+                          :rest]
+                         form)
+          sp (if (:args sp)
+                 (assoc sp :rest [(cons (:args sp)
+                                        (:rest sp))])
+                 sp)
+          sp (if (:name sp)
+                 sp
+                 (assoc sp :name (gensym "fn")))]
+          {:node-type :fn
+           :forms (vec (map parse-fn-body (:rest sp) (repeat env)))
+           :name (:name sp)
+           :meta (meta form)}))
+           
 
 (def ^:dynamic *compiler-intrinsics*
-    {'if parse-if})
+    {'if parse-if
+     'fn* parse-fn*})
 
 (defn is-intrinsic? [n]
      (contains? *compiler-intrinsics* n))
@@ -106,5 +159,6 @@
              :args (map parse (next nd) (repeat env))
              :meta (meta nd)})))
               
-    
+(defn parsep [& x]
+    (clojure.pprint/pprint (apply parse x)))
     
