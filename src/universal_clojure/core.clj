@@ -108,15 +108,33 @@
          :else (if else (parse else env) (parse nil env))
          :meta (meta form)}))
 
+(defn debug [p]
+   (println p)
+   p)
+
+(defn foreach-val [m f]
+  (into {} (debug (for [[k v] m] 
+         
+              [k (f v)]))))
+
+(defn promote-closures [env]
+    (let [closures (:locals env)]
+         (assoc env 
+                :locals
+                (foreach-val (:locals env)
+                            #(cons {:type :closure} %)))))
+        
+    
+
 (defn parse-fn-body [form env]
     (let [[args & body] form
           [args & restarg] (split-with #(not (= '& %)) args)
           restarg (next (first restarg))
           last-is-rest (= (count restarg) 1)]
           (println restarg (count restarg))
-         {:args (concat args restarg)
+         {:args (vec (concat args restarg))
           :last-is-rest last-is-rest
-          :body (parse body env)
+          :body (map parse body (repeat env))
           :required-arity (count args)
           :rest-arg (when last-is-rest (first restarg))
           :meta (meta form)}))
