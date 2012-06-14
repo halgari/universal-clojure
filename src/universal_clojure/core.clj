@@ -35,7 +35,8 @@
                          map? :map
                          seq? :seq
                          symbol? :symbol
-                         number? :number})
+                         number? :number
+                         string? :string})
 
 (defn merge-hash-set
     "Take several hash sets and merge them into a single set. There has to be a
@@ -85,6 +86,12 @@
 (defmethod parse-node :nil [nd env]
     {:node-type :const
      :data-type :nil
+     :meta (meta nd)})
+
+(defmethod parse-node :string [nd env]
+    {:node-type :const
+     :data-type :string
+     :value nd
      :meta (meta nd)})
 
 (defmethod parse-node :vector [nd env]
@@ -223,7 +230,7 @@
           (println restarg (count restarg))
          {:args argsvec
           :last-is-rest last-is-rest
-          :body (map parse body (repeat newenv))
+          :body (parse-implicit-do body env)
           :required-arity (count args)
           :rest-arg (when last-is-rest (first restarg))
           :meta (meta form)}))
@@ -245,7 +252,20 @@
            :forms (vec (map #(clean-map (parse-fn-body %1 %2)) (:rest sp) (repeat env)))
            :name (:name sp)
            :meta (meta form)}))
-           
+
+(defn parse-implicit-do [body env]
+     (cond (nil? body) (parse nil env) ; default to nil
+       (nil? (next body)) (parse (first body) env) ; optimize out this do
+       :else
+        (let [body (map parse body (repeat env))
+              locals (apply merge-hash-set (map :used-locals body))]
+             {:node-type :do
+              :used-locals locals
+              :body body})))
+
+(defn parse-do [form env]
+     (merge (parse-implicit-do (next form) env)
+            {:meta (meta form)}))
 
 (def ^:dynamic *compiler-intrinsics*
     {'if parse-if
@@ -271,4 +291,4 @@
 (defn parsep [& x]
     (clojure.pprint/pprint (apply parse x)))
 
-(parsep '(fn length [a b] (sqrt (* a a) (* b b))))
+(parsep '(fn length [a b] (print "fo") (sqrt (* a a) (* b b))))
