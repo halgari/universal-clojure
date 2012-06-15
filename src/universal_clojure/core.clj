@@ -27,7 +27,9 @@
 ;; encoder (or any output) and then compiled to a new platform. What we've done
 ;; is de-complected the syntactic analysis from the VM code emission. 
 
-
+(defn debug [p]
+   (println p)
+   p)
 
 ;; These map predicates to keywords. 
 (def ^:dynamic *tp-maps* {vector? :vector
@@ -43,6 +45,12 @@
     better way, but I can't seem to find it at the moment"
     [& sets]
     (apply hash-set (distinct (apply concat sets))))
+
+(def ^:dynamic *compiler-intrinsics* (atom {}))
+
+(defmacro defintrinsic [name & body]
+    `(swap! *compiler-intrinsics* assoc (quote ~name)
+            (fn ~name ~@body)))
 
 (defn spec-parse 
     "Helper function for parsing arguments"
@@ -110,10 +118,15 @@
      [mp]
      (select-keys mp (for [[k v] mp :when (not (filterable-key v))] k)))
      
+(defn make-env []
+    {:namespace (atom {})})
+
+(defn parse-with-env
+    ([nd]
+     (let [env (make-env)]
+          [(parse nd env) env])))
 
 (defn parse 
-    ([nd]
-     (parse nd {}))
     ([nd env]
      (let [result (parse-node (macroexpand nd) env)]
          (clean-map result))))
@@ -160,7 +173,7 @@
      :meta (meta nd)})
 
 
-(defn parse-if [form env]
+(defintrinsic if [form env]
     (let [[_ cond then & else] form]
         {:node-type :if
          :cond (parse cond env)
@@ -168,9 +181,12 @@
          :else (if else (parse else env) (parse nil env))
          :meta (meta form)}))
 
-(defn debug [p]
-   (println p)
-   p)
+(defintrinsic ns [form env]
+    (swap! (:namespace env) 
+           merge
+           {:name (next form)}))
+
+
 
 (defn foreach-val [m f]
   (into {} (for [[k v] m] 
@@ -218,7 +234,9 @@
            (merge (:locals env)
                (into {} (map #(hash-map (get args %)
                                         (make-fn-arg (get args %) % env))
-                              (range (count args)))))))
+
+                       (range (count args)))))))
+(def parse-implicit-do)
 
 (defn parse-fn-body [form env]
     (let [[args & body] form
@@ -235,7 +253,7 @@
           :rest-arg (when last-is-rest (first restarg))
           :meta (meta form)}))
     
-(defn parse-fn* [form env]
+(defintrinsic fn* [form env]
     (let [sp (spec-parse [[symbol? :fn]
                           [symbol? :name]
                           [vector? :args]
@@ -263,19 +281,16 @@
               :used-locals locals
               :body body})))
 
-(defn parse-do [form env]
+(defintrinsic do [form env]
+     
      (merge (parse-implicit-do (next form) env)
             {:meta (meta form)}))
 
-(def ^:dynamic *compiler-intrinsics*
-    {'if parse-if
-     'fn* parse-fn*})
-
 (defn is-intrinsic? [n]
-     (contains? *compiler-intrinsics* n))
+     (contains? @*compiler-intrinsics* n))
 
 (defn parse-intrinsic [nd env]
-    ((get *compiler-intrinsics* (first nd)) nd env))
+    ((get @*compiler-intrinsics* (first nd)) nd env))
 
 (defn parse-invoke [nd env]
     (let [n (first nd)]
@@ -289,6 +304,6 @@
                   :meta (meta nd)}))))
               
 (defn parsep [& x]
-    (clojure.pprint/pprint (apply parse x)))
+    (clojure.pprint/pprint (apply parse-with-env x)))
 
-(parsep '(fn length [a b] (print "fo") (sqrt (* a a) (* b b))))
+(parsep '(do (ns foo.core) (fn length [a b] (print "fo") (sqrt (* a a) (* b b)))))
