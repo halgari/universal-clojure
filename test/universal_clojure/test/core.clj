@@ -10,7 +10,11 @@
 
 (defmacro comp-test [name form]
 
-  `(deftest ~name (is true (= (eval (backend/compile (first (core/parse-with-env ~form)))) ~form))))
+  `(deftest ~name
+     (println ~(clojure.core/name name))
+     (is true
+         (= (eval (backend/compile (debug (first (core/parse-with-env ~form)))))
+            ~form))))
 
 
 (comp-test nil-is-nil nil)
@@ -20,3 +24,7 @@
 (comp-test vector-is-empty [])
 (comp-test vector-is-single [1])
 (comp-test long-vector (vec (range 100)))
+
+(comp-test empty-do (do))
+(comp-test single-do (do 1))
+(comp-test multi-do (do 1 2 3))
