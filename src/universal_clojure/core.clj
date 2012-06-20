@@ -1,4 +1,6 @@
-(ns universal-clojure.core)
+(ns universal-clojure.core
+  (:refer-clojure :exclude  [macroexpand-1])
+  (:require [universal-clojure.common.macros :as macros]))
 
 ;; Welcome to Universal-Clojure. The idea behind this project is to provide
 ;; platform a platform-agnostic Clojure code parser. Firstly we should explain
@@ -8,9 +10,9 @@
 (comment
 
     (parse (with-meta '(+ a 1) {:line 42}))
-    
+
     ;returns
-    
+
     {:node-type :invoke
      :fn {:node-type :global-lookup
           :symbol '+}
@@ -20,18 +22,45 @@
              :type :int
              :value 1}]
      :meta {:line 42}}
-     
+
  )
 ;; So the over all point of this project is to provide all the syntax interpretation
 ;; in platform agnostic clojure code. The output of (parse) can be fed into a JSON
 ;; encoder (or any output) and then compiled to a new platform. What we've done
-;; is de-complected the syntactic analysis from the VM code emission. 
+;; is de-complected the syntactic analysis from the VM code emission.
 
 (defn debug [p]
    (println p)
    p)
 
-;; These map predicates to keywords. 
+
+(defn macro? [f]
+  (:macro (meta f)))
+
+(defn macroexpand-1 [env [ft & rst]]
+  (let [m (get ft (ns-publics 'macros))]
+    (if (macro? m)
+      (apply m nil env rst)
+      (cons ft rst))))
+
+;; Forward def for the body of a do
+(def parse-implicit-do)
+
+;; compiler intrinsics are functions that create AST nodes. Examples of this are
+;; fn*, let*, etc.
+(def ^:dynamic *compiler-intrinsics* (atom {}))
+
+;; Forward def for parsing of invokes
+(def parse-invoke)
+
+
+;; Main entry point for this library passing a form to this function will return
+;; the parse AST
+
+(def parse)
+
+
+;; These map predicates to keywords.
 (def ^:dynamic *tp-maps* {vector? :vector
                          nil? :nil
                          map? :map
@@ -40,20 +69,41 @@
                          number? :number
                          string? :string})
 
+
+(defn get-node-kw
+    "For a given node, return a keyword. Why not use (type nd)? Well that isn't
+    platform agnostic. Instead we want to unify all versions of maps under :map,
+    all vectors should be :vectors, etc."
+     [nd env]
+    (let [kw (second (first (filter (fn [[k v]] (k nd)) *tp-maps*)))]
+         (if kw
+             kw
+             (throw (Exception. (str "Unknown Node type " (type nd)))))))
+
+
+;; Here we can install new node parsers this will dispatch on the type of the node
+;; so passing in nil will dispatch using :nil, a vector will get passed to :vector
+;; etc.
+(defmulti parse-node get-node-kw)
+
+
 (defn merge-hash-set
     "Take several hash sets and merge them into a single set. There has to be a
     better way, but I can't seem to find it at the moment"
     [& sets]
     (apply hash-set (distinct (apply concat sets))))
 
-(def ^:dynamic *compiler-intrinsics* (atom {}))
 
 (defmacro defintrinsic [name & body]
     `(swap! *compiler-intrinsics* assoc (quote ~name)
             (fn ~name ~@body)))
 
-(defn spec-parse 
-    "Helper function for parsing arguments"
+(defn spec-parse
+  "Helper function for parsing arguments. The idea here is that you can pass in a list of
+   predicates and keywords. This function tries to match each item in the seq to a keyword
+   by using a predicate. If the predicate fails, the curren item being matched falls through
+   to the next predicate. It's a bit hard to explain, so check out the use cases in this file
+   for a better example"
     [spec data]
     (loop [data data
            spec spec
@@ -61,8 +111,8 @@
           (let [curspec (first spec)]
               (cond (or (not data) (not spec)) result
                     (= (first spec) :rest) (assoc result :rest data)
-                    ((first curspec) (first data)) 
-                     (recur (next data) 
+                    ((first curspec) (first data))
+                     (recur (next data)
                             (next spec)
                             (assoc result (fnext (first spec))
                                           (first data)))
@@ -71,42 +121,36 @@
                             (next spec)
                             result)))))
 
-(defn get-node-kw
-    "For a given node, return a keyword. Why not use (type nd)? Well that isn't
-    platform agnostic. Instead we want to unify all versions of maps under :map,
-    all vectors should be :vectors, etc."
-     [nd env]
-    (let [kw (second (first (filter (fn [[k v]] (k nd)) *tp-maps*)))]
-         (if kw 
-             kw
-             (throw (Exception. (str "Unknown Node type " (type nd)))))))
-                         
+
 
 (defn filterable-key [k]
     (cond (nil? k) true
           (and (seq? k) (empty? k)) true
           :default false))
 
-(defmulti parse-node get-node-kw)
+;; Parse nodes of each type.
 
-(def parse)
-
+;; nil gets parsed as a const
 (defmethod parse-node :nil [nd env]
     {:node-type :const
      :data-type :nil
      :meta (meta nd)})
 
+;; strings are consts
 (defmethod parse-node :string [nd env]
     {:node-type :const
      :data-type :string
      :value nd
      :meta (meta nd)})
 
+;; TODO: extend this to check for being inside a quote
+;; Parse this as a vector node, and parse our children
 (defmethod parse-node :vector [nd env]
     {:node-type :vector-literal
      :items (map parse nd (repeat env))
      :meta (meta nd)})
 
+;; Same as vectors, but for maps
 (defmethod parse-node :map [nd env]
     {:node-type :map-literal
      :items (map parse (mapcat identity nd) (repeat env))
@@ -117,26 +161,29 @@
      we use this so that we can get rid of all sorts of garbage in the output"
      [mp]
      (select-keys mp (for [[k v] mp :when (not (filterable-key v))] k)))
-     
+
+
 (defn make-env []
+  "Create a default environment. We use a atom here so that child nodes can
+   define global defs."
     {:namespace (atom {})})
 
 (defn parse-with-env
+    "parses nd with a new environment"
     ([nd]
      (let [env (make-env)]
           [(parse nd env) env])))
 
-(defn parse 
+(defn parse
     ([nd env]
-     (let [result (parse-node (macroexpand nd) env)]
+     (let [result (parse-node nd env)]
          (clean-map result))))
 
-(def parse-invoke)
 
 (defmethod parse-node :seq [nd env]
     (if (:quoted env)
         {:node-type :seq-literal
-         :items (map parse nd (repeat env))
+         :items (map parse (macroexpand-1 env nd) (repeat env))
          :meta (meta nd)}
         (parse-invoke nd env)))
 
@@ -146,13 +193,20 @@
      :value nd
      :meta (meta nd)})
 
-;; Resolves a symbol. If we're currently inside a quoted literal, then 
+;; numbers are consts
+(defmethod parse-node :number [nd env]
+    {:node-type :const
+     :data-type :number
+     :value nd
+     :meta (meta nd)})
+
+;; Resolves a symbol. If we're currently inside a quoted literal, then
 ;; output a symbol literal. Otherwise decide if the symbol is a local
 ;; or a global
 (defmethod parse-node :symbol [nd env]
     (let [locals (:locals env)]
          (cond (:quoted env)
-                {:node-type :const 
+                {:node-type :const
                  :data-type :symbol
                  :value nd
                  :meta (meta nd)}
@@ -166,13 +220,8 @@
                   :value nd
                   :meta (meta nd)})))
 
-(defmethod parse-node :number [nd env]
-    {:node-type :const
-     :data-type :number
-     :value nd
-     :meta (meta nd)})
 
-
+;; Compiler intrinsic if. We tag each form as cond, then or else
 (defintrinsic if [form env]
     (let [[_ cond then & else] form]
         {:node-type :if
@@ -181,21 +230,22 @@
          :else (if else (parse else env) (parse nil env))
          :meta (meta form)}))
 
+
 (defintrinsic ns [form env]
-    (swap! (:namespace env) 
+    (swap! (:namespace env)
            merge
            {:name (next form)}))
 
 
 
 (defn foreach-val [m f]
-  (into {} (for [[k v] m] 
-         
+  (into {} (for [[k v] m]
+
               [k (f v)])))
 
 (defn promote-closures [env]
     (let [closures (:locals env)]
-         (assoc env 
+         (assoc env
                 :locals
                 (foreach-val (:locals env)
                             #(cons {:type :closure} %)))))
@@ -206,11 +256,11 @@
                        (assoc locals
                               loc
                               (cons {:type :local} (get locals loc))))]
-         (assoc locals 
+         (assoc locals
                 :locals
-                (reduce locmerge locals))))                 
-        
-(defn make-fn-arg 
+                (reduce locmerge locals))))
+
+(defn make-fn-arg
     "given a symbol and an existing env, create a local. Tag the given local
      with the argument offset. So for (fn [a b] a) a is tagged as offset 0, and
      b as 1"
@@ -234,9 +284,8 @@
            (merge (:locals env)
                (into {} (map #(hash-map (get args %)
                                         (make-fn-arg (get args %) % env))
+                             (range (count args)))))))
 
-                       (range (count args)))))))
-(def parse-implicit-do)
 
 (defn parse-fn-body [form env]
     (let [[args & body] form
@@ -245,14 +294,13 @@
           last-is-rest (= (count restarg) 1)
           argsvec (vec (concat args restarg))
           newenv (new-locals-from-fn-args argsvec env)]
-          (println restarg (count restarg))
-         {:args argsvec
+          {:args argsvec
           :last-is-rest last-is-rest
           :body (parse-implicit-do body env)
           :required-arity (count args)
           :rest-arg (when last-is-rest (first restarg))
           :meta (meta form)}))
-    
+
 (defintrinsic fn* [form env]
     (let [sp (spec-parse [[symbol? :fn]
                           [symbol? :name]
@@ -282,7 +330,7 @@
               :body body})))
 
 (defintrinsic do [form env]
-     
+
      (merge (parse-implicit-do (next form) env)
             {:meta (meta form)}))
 
@@ -294,7 +342,7 @@
 
 (defn parse-invoke [nd env]
     (let [n (first nd)]
-        (if (and (symbol? n) (is-intrinsic? n)) 
+        (if (and (symbol? n) (is-intrinsic? n))
             (parse-intrinsic nd env)
             (let [args (map parse (next nd) (repeat env))]
                  {:node-type :invoke
@@ -302,8 +350,9 @@
                   :args args
                   :used-locals (apply merge-hash-set (map :used-locals args))
                   :meta (meta nd)}))))
-              
-(defn parsep [& x]
-    (clojure.pprint/pprint (apply parse-with-env x)))
 
-(parsep '(do (ns foo.core) (fn length [a b] (print "fo") (sqrt (* a a) (* b b)))))
+(defn parsep [& x]
+
+    (println (apply parse-with-env x)))
+
+(parsep '(fn* [x] x ))
