@@ -1,0 +1,110 @@
+{
+  "items" : [ {
+    "name" : [ "universal-clojure.test.test-data" ]
+  }, {
+    "used-locals" : null,
+    "args" : [ {
+      "value" : "data",
+      "node-type" : "global-lookup"
+    }, {
+      "items" : [ {
+        "value" : 1,
+        "data-type" : "number",
+        "node-type" : "const"
+      }, {
+        "value" : 2,
+        "data-type" : "number",
+        "node-type" : "const"
+      }, {
+        "data-type" : "nil",
+        "node-type" : "const"
+      }, {
+        "value" : "foo",
+        "data-type" : "string",
+        "node-type" : "const"
+      }, {
+        "node-type" : "const",
+        "data-type" : "nil"
+      }, {
+        "node-type" : "const",
+        "data-type" : "number",
+        "value" : 1
+      }, {
+        "body" : [ {
+          "value" : 1,
+          "data-type" : "number",
+          "node-type" : "const"
+        }, {
+          "value" : 2,
+          "data-type" : "number",
+          "node-type" : "const"
+        }, {
+          "value" : 3,
+          "data-type" : "number",
+          "node-type" : "const"
+        } ],
+        "used-locals" : null,
+        "node-type" : "do"
+      }, {
+        "node-type" : "vector-literal"
+      }, {
+        "items" : [ {
+          "value" : 1,
+          "data-type" : "number",
+          "node-type" : "const"
+        } ],
+        "node-type" : "vector-literal"
+      }, {
+        "items" : [ {
+          "value" : 1,
+          "data-type" : "number",
+          "node-type" : "const"
+        }, {
+          "value" : 2,
+          "data-type" : "number",
+          "node-type" : "const"
+        }, {
+          "value" : 3,
+          "data-type" : "number",
+          "node-type" : "const"
+        }, {
+          "value" : 4,
+          "data-type" : "number",
+          "node-type" : "const"
+        }, {
+          "value" : 5,
+          "data-type" : "number",
+          "node-type" : "const"
+        }, {
+          "value" : 6,
+          "data-type" : "number",
+          "node-type" : "const"
+        }, {
+          "value" : 7,
+          "data-type" : "number",
+          "node-type" : "const"
+        }, {
+          "value" : 8,
+          "data-type" : "number",
+          "node-type" : "const"
+        }, {
+          "value" : 8,
+          "data-type" : "number",
+          "node-type" : "const"
+        }, {
+          "value" : 11,
+          "data-type" : "number",
+          "node-type" : "const"
+        } ],
+        "node-type" : "vector-literal"
+      } ],
+      "node-type" : "vector-literal"
+    } ],
+    "fn" : {
+      "value" : "def",
+      "node-type" : "global-lookup"
+    },
+    "node-type" : "invoke"
+  } ],
+  "node-type" : "vector-literal"
+}

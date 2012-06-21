@@ -320,14 +320,13 @@
            :meta (meta form)}))
 
 (defn parse-implicit-do [body env]
-     (cond (nil? body) (parse nil env) ; default to nil
-       (nil? (next body)) (parse (first body) env) ; optimize out this do
-       :else
-        (let [body (map parse body (repeat env))
-              locals (apply merge-hash-set (map :used-locals body))]
-             {:node-type :do
-              :used-locals locals
-              :body body})))
+  (cond (nil? body) (parse nil env) ; default to nil
+        (nil? (next body)) (parse (first body) env) ; optimize out this do
+        :else (let [body (map parse body (repeat env))
+                    locals (apply merge-hash-set (map :used-locals body))]
+                {:node-type :do
+                 :used-locals locals
+                 :body body})))
 
 (defintrinsic do [form env]
 
@@ -354,5 +353,3 @@
 (defn parsep [& x]
 
     (println (apply parse-with-env x)))
-
-(parsep '(fn* [x] x ))
