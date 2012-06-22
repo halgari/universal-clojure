@@ -60,6 +60,9 @@
 (def parse)
 
 
+(defn bool? [nd]
+  (or (= nd true) (= nd false)))
+
 ;; These map predicates to keywords.
 (def ^:dynamic *tp-maps* {vector? :vector
                          nil? :nil
@@ -67,7 +70,8 @@
                          seq? :seq
                          symbol? :symbol
                          number? :number
-                         string? :string})
+                          string? :string
+                          bool? :bool})
 
 
 (defn get-node-kw
@@ -200,6 +204,12 @@
      :value nd
      :meta (meta nd)})
 
+(defmethod parse-node :bool [nd env]
+  {:node-type :const
+   :data-type :bool
+   :value nd
+   :meta (meta nd)})
+
 ;; Resolves a symbol. If we're currently inside a quoted literal, then
 ;; output a symbol literal. Otherwise decide if the symbol is a local
 ;; or a global
@@ -227,7 +237,7 @@
         {:node-type :if
          :cond (parse cond env)
          :then (parse then env)
-         :else (if else (parse else env) (parse nil env))
+         :else (if else (parse (first else) env) (parse nil env))
          :meta (meta form)}))
 
 

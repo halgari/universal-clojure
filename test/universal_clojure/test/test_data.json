@@ -97,4 +97,90 @@
     "node-type" : "const"
   } ],
   "node-type" : "vector-literal"
-}, [ 1, 2, 3, 4, 5, 6, 7, 8, 8, 11 ] ] ]
+}, [ 1, 2, 3, 4, 5, 6, 7, 8, 8, 11 ] ], [ {
+  "value" : true,
+  "data-type" : "bool",
+  "node-type" : "const"
+}, true ], [ {
+  "value" : false,
+  "data-type" : "bool",
+  "node-type" : "const"
+}, false ], [ {
+  "meta" : {
+    "line" : 17
+  },
+  "else" : {
+    "value" : 0,
+    "data-type" : "number",
+    "node-type" : "const"
+  },
+  "then" : {
+    "value" : 1,
+    "data-type" : "number",
+    "node-type" : "const"
+  },
+  "cond" : {
+    "value" : true,
+    "data-type" : "bool",
+    "node-type" : "const"
+  },
+  "node-type" : "if"
+}, 1 ], [ {
+  "meta" : {
+    "line" : 18
+  },
+  "else" : {
+    "value" : 2,
+    "data-type" : "number",
+    "node-type" : "const"
+  },
+  "then" : {
+    "value" : 1,
+    "data-type" : "number",
+    "node-type" : "const"
+  },
+  "cond" : {
+    "value" : false,
+    "data-type" : "bool",
+    "node-type" : "const"
+  },
+  "node-type" : "if"
+}, 2 ], [ {
+  "meta" : {
+    "line" : 19
+  },
+  "else" : {
+    "data-type" : "nil",
+    "node-type" : "const"
+  },
+  "then" : {
+    "value" : 1,
+    "data-type" : "number",
+    "node-type" : "const"
+  },
+  "cond" : {
+    "value" : true,
+    "data-type" : "bool",
+    "node-type" : "const"
+  },
+  "node-type" : "if"
+}, 1 ], [ {
+  "meta" : {
+    "line" : 20
+  },
+  "else" : {
+    "data-type" : "nil",
+    "node-type" : "const"
+  },
+  "then" : {
+    "value" : 1,
+    "data-type" : "number",
+    "node-type" : "const"
+  },
+  "cond" : {
+    "value" : false,
+    "data-type" : "bool",
+    "node-type" : "const"
+  },
+  "node-type" : "if"
+}, null ] ]

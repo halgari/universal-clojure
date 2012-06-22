@@ -26,8 +26,20 @@
   [node env]
   (:value node))
 
+(defmethod compile-const :bool
+  [node env]
+  (:value node))
+
 (defmethod compile-node :vector-literal [node env]
   (vec (map #(compile-node % env) (:items node))))
+
+(defmethod compile-node :if [node env]
+  `(if ~(compile-node (:cond node) env)
+     ~(compile-node (:then node) env)
+     ~(compile-node (:else node) env)))
+
+(defmethod compile-node :do [node env]
+  `(do ~@(map compile-node (:body node) (repeat env))))
 
 ;; Main entry function
 (defn compile
