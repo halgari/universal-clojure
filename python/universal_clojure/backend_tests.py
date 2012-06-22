@@ -1,7 +1,7 @@
 import backend
 import json
 
-with open("../test/universal_clojure/test/test_data.json") as f:
+with open("../../test/universal_clojure/test/test_data.json") as f:
     nodes = json.load(f)
 
 
