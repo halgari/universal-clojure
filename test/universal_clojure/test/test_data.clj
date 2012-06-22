@@ -2,7 +2,7 @@
 
 
 (def data
-  [1
+  '[1
    2
    nil
    "foo"

@@ -1,110 +1,100 @@
-{
-  "items" : [ {
-    "name" : [ "universal-clojure.test.test-data" ]
+[ [ {
+  "value" : 1,
+  "data-type" : "number",
+  "node-type" : "const"
+}, 1 ], [ {
+  "value" : 2,
+  "data-type" : "number",
+  "node-type" : "const"
+}, 2 ], [ {
+  "data-type" : "nil",
+  "node-type" : "const"
+}, null ], [ {
+  "value" : "foo",
+  "data-type" : "string",
+  "node-type" : "const"
+}, "foo" ], [ {
+  "node-type" : "const",
+  "data-type" : "nil",
+  "meta" : {
+    "line" : 9
+  }
+}, null ], [ {
+  "node-type" : "const",
+  "data-type" : "number",
+  "value" : 1,
+  "meta" : {
+    "line" : 10
+  }
+}, 1 ], [ {
+  "body" : [ {
+    "value" : 1,
+    "data-type" : "number",
+    "node-type" : "const"
   }, {
-    "used-locals" : null,
-    "args" : [ {
-      "value" : "data",
-      "node-type" : "global-lookup"
-    }, {
-      "items" : [ {
-        "value" : 1,
-        "data-type" : "number",
-        "node-type" : "const"
-      }, {
-        "value" : 2,
-        "data-type" : "number",
-        "node-type" : "const"
-      }, {
-        "data-type" : "nil",
-        "node-type" : "const"
-      }, {
-        "value" : "foo",
-        "data-type" : "string",
-        "node-type" : "const"
-      }, {
-        "node-type" : "const",
-        "data-type" : "nil"
-      }, {
-        "node-type" : "const",
-        "data-type" : "number",
-        "value" : 1
-      }, {
-        "body" : [ {
-          "value" : 1,
-          "data-type" : "number",
-          "node-type" : "const"
-        }, {
-          "value" : 2,
-          "data-type" : "number",
-          "node-type" : "const"
-        }, {
-          "value" : 3,
-          "data-type" : "number",
-          "node-type" : "const"
-        } ],
-        "used-locals" : null,
-        "node-type" : "do"
-      }, {
-        "node-type" : "vector-literal"
-      }, {
-        "items" : [ {
-          "value" : 1,
-          "data-type" : "number",
-          "node-type" : "const"
-        } ],
-        "node-type" : "vector-literal"
-      }, {
-        "items" : [ {
-          "value" : 1,
-          "data-type" : "number",
-          "node-type" : "const"
-        }, {
-          "value" : 2,
-          "data-type" : "number",
-          "node-type" : "const"
-        }, {
-          "value" : 3,
-          "data-type" : "number",
-          "node-type" : "const"
-        }, {
-          "value" : 4,
-          "data-type" : "number",
-          "node-type" : "const"
-        }, {
-          "value" : 5,
-          "data-type" : "number",
-          "node-type" : "const"
-        }, {
-          "value" : 6,
-          "data-type" : "number",
-          "node-type" : "const"
-        }, {
-          "value" : 7,
-          "data-type" : "number",
-          "node-type" : "const"
-        }, {
-          "value" : 8,
-          "data-type" : "number",
-          "node-type" : "const"
-        }, {
-          "value" : 8,
-          "data-type" : "number",
-          "node-type" : "const"
-        }, {
-          "value" : 11,
-          "data-type" : "number",
-          "node-type" : "const"
-        } ],
-        "node-type" : "vector-literal"
-      } ],
-      "node-type" : "vector-literal"
-    } ],
-    "fn" : {
-      "value" : "def",
-      "node-type" : "global-lookup"
-    },
-    "node-type" : "invoke"
+    "value" : 2,
+    "data-type" : "number",
+    "node-type" : "const"
+  }, {
+    "value" : 3,
+    "data-type" : "number",
+    "node-type" : "const"
+  } ],
+  "used-locals" : null,
+  "node-type" : "do",
+  "meta" : {
+    "line" : 11
+  }
+}, 3 ], [ {
+  "node-type" : "vector-literal"
+}, [ ] ], [ {
+  "items" : [ {
+    "value" : 1,
+    "data-type" : "number",
+    "node-type" : "const"
   } ],
   "node-type" : "vector-literal"
-}
+}, [ 1 ] ], [ {
+  "items" : [ {
+    "value" : 1,
+    "data-type" : "number",
+    "node-type" : "const"
+  }, {
+    "value" : 2,
+    "data-type" : "number",
+    "node-type" : "const"
+  }, {
+    "value" : 3,
+    "data-type" : "number",
+    "node-type" : "const"
+  }, {
+    "value" : 4,
+    "data-type" : "number",
+    "node-type" : "const"
+  }, {
+    "value" : 5,
+    "data-type" : "number",
+    "node-type" : "const"
+  }, {
+    "value" : 6,
+    "data-type" : "number",
+    "node-type" : "const"
+  }, {
+    "value" : 7,
+    "data-type" : "number",
+    "node-type" : "const"
+  }, {
+    "value" : 8,
+    "data-type" : "number",
+    "node-type" : "const"
+  }, {
+    "value" : 8,
+    "data-type" : "number",
+    "node-type" : "const"
+  }, {
+    "value" : 11,
+    "data-type" : "number",
+    "node-type" : "const"
+  } ],
+  "node-type" : "vector-literal"
+}, [ 1, 2, 3, 4, 5, 6, 7, 8, 8, 11 ] ] ]

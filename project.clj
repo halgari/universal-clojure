@@ -3,4 +3,4 @@
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [cheshire "4.0.0"]]
   :dev-dependencies [[lein-marginalia "0.7.1"]]
-  :aliases {"export" ["run" "-m" "universal-clojure.exporter"]})
+  :aliases {"export-tests" ["run" "-m" "universal-clojure.export-tests"]})

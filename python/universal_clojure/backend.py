@@ -3,10 +3,6 @@ import sys
 import util.treadle as tr
 
 
-with open(sys.argv[1]) as f:
-    nodes = json.load(f)["items"][1:]
-
-
 node_emitters = {}
 const_emitters = {}
 
@@ -32,6 +28,23 @@ def __compile_const(node, env):
 def __compile_string(node, env):
     return tr.Const(node["value"])
 
+@const_emitter
+def __compile_number(node, env):
+    return tr.Const(node["value"])
+
+@node_emitter
+def __compile_do(node, env):
+    return tr.Do(*map(lambda x: compile_node(x, env), node["body"]))
+
+@node_emitter
+def __compile_vector_literal(node, env):
+    if "items" in node:
+        items = map(lambda x: compile_node(x, env), node["items"])
+    else:
+        items = []
+
+    return tr.List(*items)
+
 @node_emitter
 def __compile_invoke(node, env):
     fn = tr.Global(node["fn"]["value"])
@@ -45,10 +58,3 @@ def __compile_invoke(node, env):
 @const_emitter
 def __compile_nil(node, env):
     return tr.Const(None)
-
-nodes = [{"node-type": "const", "data-type": "string", "value": "foo"}]
-print nodes
-for x in nodes:
-    print x
-    comp = compile_node(x, {})
-    print comp.toFunc()()
