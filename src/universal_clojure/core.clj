@@ -303,13 +303,15 @@
           restarg (next (first restarg))
           last-is-rest (= (count restarg) 1)
           argsvec (vec (concat args restarg))
-          newenv (new-locals-from-fn-args argsvec env)]
+          newenv (new-locals-from-fn-args argsvec env)
+          body (parse-implicit-do body newenv)]
           {:args argsvec
-          :last-is-rest last-is-rest
-          :body (parse-implicit-do body env)
-          :required-arity (count args)
-          :rest-arg (when last-is-rest (first restarg))
-          :meta (meta form)}))
+           :last-is-rest last-is-rest
+           :body body
+           :used-locals (:used-locals body)
+           :required-arity (count args)
+           :rest-arg (when last-is-rest (first restarg))
+           :meta (meta form)}))
 
 (defintrinsic fn* [form env]
     (let [sp (spec-parse [[symbol? :fn]

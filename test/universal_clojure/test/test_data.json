@@ -17,14 +17,14 @@
   "node-type" : "const",
   "data-type" : "nil",
   "meta" : {
-    "line" : 9
+    "line" : 17
   }
 }, null ], [ {
   "node-type" : "const",
   "data-type" : "number",
   "value" : 1,
   "meta" : {
-    "line" : 10
+    "line" : 18
   }
 }, 1 ], [ {
   "body" : [ {
@@ -43,7 +43,7 @@
   "used-locals" : null,
   "node-type" : "do",
   "meta" : {
-    "line" : 11
+    "line" : 19
   }
 }, 3 ], [ {
   "node-type" : "vector-literal"
@@ -107,7 +107,7 @@
   "node-type" : "const"
 }, false ], [ {
   "meta" : {
-    "line" : 17
+    "line" : 25
   },
   "else" : {
     "value" : 0,
@@ -127,7 +127,7 @@
   "node-type" : "if"
 }, 1 ], [ {
   "meta" : {
-    "line" : 18
+    "line" : 26
   },
   "else" : {
     "value" : 2,
@@ -147,7 +147,7 @@
   "node-type" : "if"
 }, 2 ], [ {
   "meta" : {
-    "line" : 19
+    "line" : 27
   },
   "else" : {
     "data-type" : "nil",
@@ -166,7 +166,7 @@
   "node-type" : "if"
 }, 1 ], [ {
   "meta" : {
-    "line" : 20
+    "line" : 28
   },
   "else" : {
     "data-type" : "nil",
@@ -183,4 +183,74 @@
     "node-type" : "const"
   },
   "node-type" : "if"
-}, null ] ]
+}, null ], [ {
+  "meta" : {
+    "line" : 31
+  },
+  "used-locals" : null,
+  "args" : [ {
+    "value" : 1,
+    "data-type" : "number",
+    "node-type" : "const"
+  }, {
+    "value" : 2,
+    "data-type" : "number",
+    "node-type" : "const"
+  } ],
+  "fn" : {
+    "meta" : {
+      "line" : 31
+    },
+    "name" : "fn487",
+    "forms" : [ {
+      "required-arity" : 2,
+      "used-locals" : [ "x" ],
+      "body" : {
+        "used-locals" : [ "x" ],
+        "node-type" : "local",
+        "local-type" : "fn-arg",
+        "name" : "x",
+        "offset" : 0
+      },
+      "last-is-rest" : false,
+      "args" : [ "x", "y" ]
+    } ],
+    "node-type" : "fn"
+  },
+  "node-type" : "invoke"
+}, 1 ], [ {
+  "meta" : {
+    "line" : 32
+  },
+  "used-locals" : null,
+  "args" : [ {
+    "value" : 1,
+    "data-type" : "number",
+    "node-type" : "const"
+  }, {
+    "value" : 2,
+    "data-type" : "number",
+    "node-type" : "const"
+  } ],
+  "fn" : {
+    "meta" : {
+      "line" : 32
+    },
+    "name" : "fn492",
+    "forms" : [ {
+      "required-arity" : 2,
+      "used-locals" : [ "y" ],
+      "body" : {
+        "used-locals" : [ "y" ],
+        "node-type" : "local",
+        "local-type" : "fn-arg",
+        "name" : "y",
+        "offset" : 1
+      },
+      "last-is-rest" : false,
+      "args" : [ "x", "y" ]
+    } ],
+    "node-type" : "fn"
+  },
+  "node-type" : "invoke"
+}, 2 ] ]

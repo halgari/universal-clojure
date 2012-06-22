@@ -81,7 +81,11 @@ class AExpression(object):
 
     def toFunc(self):
         c = self.toCode()
-        return types.FunctionType(c, {})
+
+        func = types.FunctionType(c, {})
+        if isinstance(self, Func) and self.name is not None:
+            func.__name__ = self.name
+        return func
 
 def assertAllExpressions(exprs):
     for x in exprs:
@@ -303,13 +307,14 @@ class Call(AExpression):
         ctx.stream.write(struct.pack("=BH", CALL_FUNCTION, len(self.exprs)))
 
 class Func(AExpression):
-    def __init__(self, args, expr):
+    def __init__(self, args, expr, name = None):
         for x in args:
             if not isinstance(x, Argument):
                 raise ArgumentExpressionRequiredException()
         self.args = args
         self.expr = expr
         self.value = None
+        self.name = name
 
     def size(self, current, max_seen):
         current += 1

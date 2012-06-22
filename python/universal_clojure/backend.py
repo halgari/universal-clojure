@@ -1,7 +1,7 @@
 import json
 import sys
 import util.treadle as tr
-
+from copy import copy
 
 node_emitters = {}
 const_emitters = {}
@@ -41,6 +41,24 @@ def __compile_do(node, env):
     return tr.Do(*map(lambda x: compile_node(x, env), node["body"]))
 
 @node_emitter
+def __compile_local(node, env):
+    locname = node["name"]
+    if node["local-type"] == "fn-arg":
+        return env["fnargs"][node["offset"]]
+    else:
+        raise Exception("Unknown Local type: " + node["local-type"])
+
+@node_emitter
+def __compile_fn(node, env):
+    form = node["forms"][0]
+    args = form["args"]
+    argexprs = map(lambda x: tr.Argument(str(x)), args)
+    env = copy(env)
+    env["fnargs"] = argexprs
+    return tr.Func(argexprs, compile_node(form["body"], env), str(node["name"]))
+
+
+@node_emitter
 def __compile_vector_literal(node, env):
     if "items" in node:
         items = map(lambda x: compile_node(x, env), node["items"])
@@ -57,7 +75,7 @@ def __compile_if(node, env):
 
 @node_emitter
 def __compile_invoke(node, env):
-    fn = tr.Global(node["fn"]["value"])
+    fn = compile_node(node["fn"], env)
     args = []
     for x in node["args"]:
         args.append(compile_node(x, env))

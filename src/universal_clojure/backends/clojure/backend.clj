@@ -38,8 +38,21 @@
      ~(compile-node (:then node) env)
      ~(compile-node (:else node) env)))
 
+(defmethod compile-node :invoke [node env]
+  `(~(compile-node (:fn node) env)
+    ~@(map compile-node (:args node) (repeat env))))
+
 (defmethod compile-node :do [node env]
   `(do ~@(map compile-node (:body node) (repeat env))))
+
+(defmethod compile-node :local [node env]
+  (:name node))
+
+(defn compile-fn-body [body env]
+  `(~(:args body) ~(compile-node (:body body) env)))
+
+(defmethod compile-node :fn [node env]
+  `(fn* ~(:name node) ~@(map compile-fn-body (:forms node) (repeat env))))
 
 ;; Main entry function
 (defn compile
