@@ -35,13 +35,15 @@
 
 
 (defn cache-macros []
-  (zipmap (map symbol (keys (ns-publics 'universal-clojure.common.macros)))
-          (vals (ns-publics 'universal-clojure.common.macros))))
+  (zipmap (map symbol (keys (ns-interns 'universal-clojure.common.macros)))
+          (vals (ns-interns 'universal-clojure.common.macros))))
 
 (def macros (cache-macros))
 
 (defn macro? [f]
   (:macro (meta f)))
+
+
 
 (defn macroexpand-1 [[ft & rst] env]
   (let [m (get macros ft)]
@@ -71,6 +73,7 @@
 
 ;; These map predicates to keywords.
 (def ^:dynamic *tp-maps* {vector? :vector
+
                          nil? :nil
                          map? :map
                          seq? :seq
@@ -254,6 +257,8 @@
 
 
 
+
+
 (defn foreach-val [m f]
   (into {} (for [[k v] m]
 
@@ -336,6 +341,39 @@
            :forms (vec (map #(clean-map (parse-fn-body %1 %2)) (:rest sp) (repeat env)))
            :name (:name sp)
            :meta (meta form)}))
+
+
+(defn parse-protocol-body [form envs]
+  (let [[name & specs] form
+        argspecs (first (partition-by vector? specs))
+        doc (when (string? (last specs)) (last specs))]
+    (clean-map {:arities (into {} (for [spec argspecs]
+                                    [(count spec) spec]))
+                :meta (meta form)
+                :doc doc
+                :name name})))
+
+(defintrinsic defprotocol [form env]
+  (let [[_ protoname & specs] form
+        specs (map parse-protocol-body specs (repeat env))]
+    (debug {:node-type :defprotocol
+            :name protoname
+            :specs specs
+            :meta (meta form)})))
+
+(defintrinsic extend [form env]
+  (let [[_ type & extends] form
+        extends (partition 2 extends)
+        bodyfn (fn [[ fname body]]
+                 {:fn (name fname)
+                  :with (parse body env)})
+        eparser (fn [[nm mp]]
+                  {:proto nm
+                   :fns (map bodyfn mp)})]
+    {:node-type :extend
+     :type type
+     :protos (map eparser extends)
+     :meta (meta form)} ))
 
 (defn parse-implicit-do [body env]
   (cond (nil? body) (parse nil env) ; default to nil

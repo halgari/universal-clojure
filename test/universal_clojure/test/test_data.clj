@@ -1,5 +1,6 @@
 (ns universal-clojure.test.test-data)
 
+(def string String)
 
 ;; Here we define some test data. export_tests.clj will take this
 ;; data and export it as a vector of [form, result]. This then defines
@@ -33,7 +34,17 @@
 
     ;; macros
     (when true 1 2)
-    (when false 1 2)]
+    (when false 1 2)
+
+    ;; protocols
+    (defprotocol IFoo
+      (run [x] [x y] [x y z] "Test1")
+      (foo [y] "Test3"))
+
+    (extend String
+      IFoo
+      {:foo (fn* [y] 42)})
+    ]
 
 
   )
