@@ -34,11 +34,17 @@
    p)
 
 
+(defn cache-macros []
+  (zipmap (map symbol (keys (ns-publics 'universal-clojure.common.macros)))
+          (vals (ns-publics 'universal-clojure.common.macros))))
+
+(def macros (cache-macros))
+
 (defn macro? [f]
   (:macro (meta f)))
 
-(defn macroexpand-1 [env [ft & rst]]
-  (let [m (get ft (ns-publics 'macros))]
+(defn macroexpand-1 [[ft & rst] env]
+  (let [m (get macros ft)]
     (if (macro? m)
       (apply m nil env rst)
       (cons ft rst))))
@@ -187,9 +193,9 @@
 (defmethod parse-node :seq [nd env]
     (if (:quoted env)
         {:node-type :seq-literal
-         :items (map parse (macroexpand-1 env nd) (repeat env))
+         :items (map parse nd (repeat env))
          :meta (meta nd)}
-        (parse-invoke nd env)))
+        (parse-invoke (macroexpand-1 nd env) env)))
 
 (defmethod parse-node :keyword [nd env]
     {:node-type :const

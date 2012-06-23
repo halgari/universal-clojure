@@ -29,4 +29,11 @@
 
     ;; fn defs
     ((fn* [x y] x) 1 2)
-    ((fn* [x y] y) 1 2)])
+    ((fn* [x y] y) 1 2)
+
+    ;; macros
+    (when true 1 2)
+    (when false 1 2)]
+
+
+  )

@@ -15,17 +15,11 @@
   "node-type" : "const"
 }, "foo" ], [ {
   "node-type" : "const",
-  "data-type" : "nil",
-  "meta" : {
-    "line" : 17
-  }
+  "data-type" : "nil"
 }, null ], [ {
   "node-type" : "const",
   "data-type" : "number",
-  "value" : 1,
-  "meta" : {
-    "line" : 18
-  }
+  "value" : 1
 }, 1 ], [ {
   "body" : [ {
     "value" : 1,
@@ -41,10 +35,7 @@
     "node-type" : "const"
   } ],
   "used-locals" : null,
-  "node-type" : "do",
-  "meta" : {
-    "line" : 19
-  }
+  "node-type" : "do"
 }, 3 ], [ {
   "node-type" : "vector-literal"
 }, [ ] ], [ {
@@ -106,9 +97,6 @@
   "data-type" : "bool",
   "node-type" : "const"
 }, false ], [ {
-  "meta" : {
-    "line" : 25
-  },
   "else" : {
     "value" : 0,
     "data-type" : "number",
@@ -126,9 +114,6 @@
   },
   "node-type" : "if"
 }, 1 ], [ {
-  "meta" : {
-    "line" : 26
-  },
   "else" : {
     "value" : 2,
     "data-type" : "number",
@@ -146,9 +131,6 @@
   },
   "node-type" : "if"
 }, 2 ], [ {
-  "meta" : {
-    "line" : 27
-  },
   "else" : {
     "data-type" : "nil",
     "node-type" : "const"
@@ -165,9 +147,6 @@
   },
   "node-type" : "if"
 }, 1 ], [ {
-  "meta" : {
-    "line" : 28
-  },
   "else" : {
     "data-type" : "nil",
     "node-type" : "const"
@@ -184,9 +163,6 @@
   },
   "node-type" : "if"
 }, null ], [ {
-  "meta" : {
-    "line" : 31
-  },
   "used-locals" : null,
   "args" : [ {
     "value" : 1,
@@ -198,10 +174,7 @@
     "node-type" : "const"
   } ],
   "fn" : {
-    "meta" : {
-      "line" : 31
-    },
-    "name" : "fn487",
+    "name" : "fn493",
     "forms" : [ {
       "required-arity" : 2,
       "used-locals" : [ "x" ],
@@ -219,9 +192,6 @@
   },
   "node-type" : "invoke"
 }, 1 ], [ {
-  "meta" : {
-    "line" : 32
-  },
   "used-locals" : null,
   "args" : [ {
     "value" : 1,
@@ -233,10 +203,7 @@
     "node-type" : "const"
   } ],
   "fn" : {
-    "meta" : {
-      "line" : 32
-    },
-    "name" : "fn492",
+    "name" : "fn498",
     "forms" : [ {
       "required-arity" : 2,
       "used-locals" : [ "y" ],
@@ -253,4 +220,52 @@
     "node-type" : "fn"
   },
   "node-type" : "invoke"
-}, 2 ] ]
+}, 2 ], [ {
+  "else" : {
+    "data-type" : "nil",
+    "node-type" : "const"
+  },
+  "then" : {
+    "body" : [ {
+      "value" : 1,
+      "data-type" : "number",
+      "node-type" : "const"
+    }, {
+      "value" : 2,
+      "data-type" : "number",
+      "node-type" : "const"
+    } ],
+    "used-locals" : null,
+    "node-type" : "do"
+  },
+  "cond" : {
+    "value" : true,
+    "data-type" : "bool",
+    "node-type" : "const"
+  },
+  "node-type" : "if"
+}, 2 ], [ {
+  "else" : {
+    "data-type" : "nil",
+    "node-type" : "const"
+  },
+  "then" : {
+    "body" : [ {
+      "value" : 1,
+      "data-type" : "number",
+      "node-type" : "const"
+    }, {
+      "value" : 2,
+      "data-type" : "number",
+      "node-type" : "const"
+    } ],
+    "used-locals" : null,
+    "node-type" : "do"
+  },
+  "cond" : {
+    "value" : false,
+    "data-type" : "bool",
+    "node-type" : "const"
+  },
+  "node-type" : "if"
+}, null ] ]
