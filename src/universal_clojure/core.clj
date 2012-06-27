@@ -375,6 +375,7 @@
      :protos (map eparser extends)
      :meta (meta form)} ))
 
+
 (defn parse-implicit-do [body env]
   (cond (nil? body) (parse nil env) ; default to nil
         (nil? (next body)) (parse (first body) env) ; optimize out this do
@@ -405,6 +406,28 @@
                   :args args
                   :used-locals (apply merge-hash-set (map :used-locals args))
                   :meta (meta nd)}))))
+
+(defn deftype-to-extend [extends]
+  (let [par (partition-by symbol? extends)
+        mp (apply hash-map par)
+        impl (into {} (for [proto (vals mp)
+                            method proto]
+                        [(-> (first method)
+                             name
+                             keyword)
+                         (cons 'fn method)]))
+        mp (interleave (map first (keys mp)) impl)]
+    (debug mp)))
+
+(defintrinsic deftype [form env]
+  (let [[_ name members & extends] form]
+    (debug    {:node-type :deftype
+               :name name
+               :members members
+               :extends (parse-intrinsic `(~'extend ~name ~@(deftype-to-extend extends)) env)})))
+
+
+
 
 (defn parsep [& x]
 

@@ -37,13 +37,18 @@
     (when false 1 2)
 
     ;; protocols
-    (defprotocol IFoo
-      (run [x] [x y] [x y z] "Test1")
-      (foo [y] "Test3"))
+    (do (defprotocol IAnswer
+          (baz [this] "const 42")
+          (foo [this] "Test3"))
+        (defprotocol IValue
+          (ivalue [this] "0"))
+        (deftype Answer [a]
+          IAnswer
+          (foo [this] a)
+          (baz [this] 42)
+          IValue
+          (ivalue [this] 0)))
 
-    (extend String
-      IFoo
-      {:foo (fn* [y] 42)})
     ]
 
 

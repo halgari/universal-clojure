@@ -7,7 +7,8 @@
   (-> form
       (core/parse-with-env)
       (first)
-      (vector (eval form))))
+      (vector ;(comment (eval form))
+              )))
 
 
 (defn process-data []
