@@ -407,16 +407,29 @@
                   :used-locals (apply merge-hash-set (map :used-locals args))
                   :meta (meta nd)}))))
 
+(defn null-if-empty
+  "returns null if col is empty, otherwise return coll"
+  [col]
+  (when (not (empty? (seq col))) col))
+
+(defn every-other
+  "Returns a lazy sequence of every other item from s. So
+  calling (every-other '(1 2 3 4 5)) returns '(1 3 5)"
+  [s]
+  (when-let [s (null-if-empty s)]
+    (lazy-seq (cons (first s) (every-other (drop 2 s))))))
+
+
 (defn deftype-to-extend [extends]
+  "Parses a deftype body that contains protocol, fns, protocol, fns, etc."
   (let [par (partition-by symbol? extends)
-        mp (apply hash-map par)
-        impl (into {} (for [proto (vals mp)
-                            method proto]
-                        [(-> (first method)
-                             name
-                             keyword)
-                         (cons 'fn method)]))
-        mp (interleave (map first (keys mp)) impl)]
+        protos (map first (every-other par))
+        fns (every-other (drop 1 par))
+        parse-form (fn [f] [(keyword (name (first f)))
+                           (cons 'fn* f)])
+        parse-group (fn [gp] (into {} (map parse-form gp)))
+        pfns (map parse-group fns)
+        mp (interleave protos pfns)]
     (debug mp)))
 
 (defintrinsic deftype [form env]

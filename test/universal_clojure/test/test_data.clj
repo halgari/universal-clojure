@@ -47,7 +47,8 @@
           (foo [this] a)
           (baz [this] 42)
           IValue
-          (ivalue [this] 0)))
+          (ivalue [this] 0))
+        (foo (Answer. 11)))
 
     ]
 

@@ -45,6 +45,23 @@
 (defmethod compile-node :do [node env]
   `(do ~@(map compile-node (:body node) (repeat env))))
 
+(defmethod compile-node :defprotocol [node env]
+  (let [ parse-spec (fn [s] `(~(:name s) ~@(vals (:arities s))))]
+       `(defprotocol ~(:name node)
+          ~@(map parse-spec (:specs node)))))
+
+(defmethod compile-node :deftype [node env]
+  `(do (deftype ~(:name node) ~(vec (:members node)))
+       ~(compile-node (:extends node) env)))
+
+(defmethod compile-node :deftype [node env]
+  (let [body-fn (fn [b] [(keyword (:fn b))
+                        (compile-node (:with b) env)])
+        proto-fn (fn [p] `((:proto p)
+                          ~(into {} (map body-fn p))))]
+    `(extend ~(:type node)
+       ~@(mapcat proto-fn (:protos node)))))
+
 (defmethod compile-node :local [node env]
   (:name node))
 

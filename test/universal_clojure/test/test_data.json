@@ -1,3 +1,7 @@
+{:node-type :defprotocol, :name IAnswer, :specs ({:name baz, :doc const 42, :meta {:line 41}, :arities {1 [this]}} {:name foo, :doc Test3, :meta {:line 42}, :arities {1 [this]}}), :meta nil}
+{:node-type :defprotocol, :name IValue, :specs ({:name ivalue, :doc 0, :meta {:line 44}, :arities {1 [this]}}), :meta nil}
+(IAnswer {:foo (fn* foo [this] a), :baz (fn* baz [this] 42)} IValue {:ivalue (fn* ivalue [this] 0)})
+{:node-type :deftype, :name Answer, :members [a], :extends {:node-type :extend, :type Answer, :protos ({:proto IAnswer, :fns ({:fn foo, :with {:name foo, :forms [{:required-arity 1, :body {:value a, :node-type :global-lookup}, :last-is-rest false, :args [this]}], :node-type :fn}} {:fn baz, :with {:name baz, :forms [{:required-arity 1, :body {:value 42, :data-type :number, :node-type :const}, :last-is-rest false, :args [this]}], :node-type :fn}})} {:proto IValue, :fns ({:fn ivalue, :with {:name ivalue, :forms [{:required-arity 1, :body {:value 0, :data-type :number, :node-type :const}, :last-is-rest false, :args [this]}], :node-type :fn}})}), :meta nil}}
 [ [ {
   "value" : 1,
   "data-type" : "number",
@@ -174,7 +178,7 @@
     "node-type" : "const"
   } ],
   "fn" : {
-    "name" : "fn493",
+    "name" : "fn542",
     "forms" : [ {
       "required-arity" : 2,
       "used-locals" : [ "x" ],
@@ -203,7 +207,7 @@
     "node-type" : "const"
   } ],
   "fn" : {
-    "name" : "fn498",
+    "name" : "fn547",
     "forms" : [ {
       "required-arity" : 2,
       "used-locals" : [ "y" ],
@@ -268,4 +272,126 @@
     "node-type" : "const"
   },
   "node-type" : "if"
-}, null ] ]
+}, null ], [ {
+  "body" : [ {
+    "specs" : [ {
+      "name" : "baz",
+      "doc" : "const 42",
+      "meta" : {
+        "line" : 41
+      },
+      "arities" : {
+        "1" : [ "this" ]
+      }
+    }, {
+      "name" : "foo",
+      "doc" : "Test3",
+      "meta" : {
+        "line" : 42
+      },
+      "arities" : {
+        "1" : [ "this" ]
+      }
+    } ],
+    "name" : "IAnswer",
+    "node-type" : "defprotocol"
+  }, {
+    "specs" : [ {
+      "name" : "ivalue",
+      "doc" : "0",
+      "meta" : {
+        "line" : 44
+      },
+      "arities" : {
+        "1" : [ "this" ]
+      }
+    } ],
+    "name" : "IValue",
+    "node-type" : "defprotocol"
+  }, {
+    "extends" : {
+      "node-type" : "extend",
+      "type" : "Answer",
+      "protos" : [ {
+        "proto" : "IAnswer",
+        "fns" : [ {
+          "fn" : "foo",
+          "with" : {
+            "name" : "foo",
+            "forms" : [ {
+              "required-arity" : 1,
+              "body" : {
+                "value" : "a",
+                "node-type" : "global-lookup"
+              },
+              "last-is-rest" : false,
+              "args" : [ "this" ]
+            } ],
+            "node-type" : "fn"
+          }
+        }, {
+          "fn" : "baz",
+          "with" : {
+            "name" : "baz",
+            "forms" : [ {
+              "required-arity" : 1,
+              "body" : {
+                "value" : 42,
+                "data-type" : "number",
+                "node-type" : "const"
+              },
+              "last-is-rest" : false,
+              "args" : [ "this" ]
+            } ],
+            "node-type" : "fn"
+          }
+        } ]
+      }, {
+        "proto" : "IValue",
+        "fns" : [ {
+          "fn" : "ivalue",
+          "with" : {
+            "name" : "ivalue",
+            "forms" : [ {
+              "required-arity" : 1,
+              "body" : {
+                "value" : 0,
+                "data-type" : "number",
+                "node-type" : "const"
+              },
+              "last-is-rest" : false,
+              "args" : [ "this" ]
+            } ],
+            "node-type" : "fn"
+          }
+        } ]
+      } ],
+      "meta" : null
+    },
+    "members" : [ "a" ],
+    "name" : "Answer",
+    "node-type" : "deftype"
+  }, {
+    "used-locals" : null,
+    "args" : [ {
+      "used-locals" : null,
+      "args" : [ {
+        "value" : 11,
+        "data-type" : "number",
+        "node-type" : "const"
+      } ],
+      "fn" : {
+        "value" : "Answer.",
+        "node-type" : "global-lookup"
+      },
+      "node-type" : "invoke"
+    } ],
+    "fn" : {
+      "value" : "foo",
+      "node-type" : "global-lookup"
+    },
+    "node-type" : "invoke"
+  } ],
+  "used-locals" : null,
+  "node-type" : "do"
+}, 11 ] ]

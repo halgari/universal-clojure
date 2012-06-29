@@ -7,7 +7,7 @@
   (-> form
       (core/parse-with-env)
       (first)
-      (vector ;(comment (eval form))
+      (vector (eval form)
               )))
 
 
